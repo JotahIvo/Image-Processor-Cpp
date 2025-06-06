@@ -1,0 +1,3 @@
+/home/jota/dev/ImageProcessor/build/CMakeFiles/processor.dir
+/home/jota/dev/ImageProcessor/build/CMakeFiles/edit_cache.dir
+/home/jota/dev/ImageProcessor/build/CMakeFiles/rebuild_cache.dir
