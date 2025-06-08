@@ -25,12 +25,22 @@ class Image {
 
         bool save(const std::string& filename) const;
 
+        void applyGrayScale();
+
+        void applyInvert();
+
+        void applyBlur();
+
         int getWidth() const {
             return this->m_width;
         }
 
         int getHeight() const {
             return this->m_height;
+        }
+
+        int getPixelIndex(int x, int y) {
+            return (y * m_width) + x;
         }
 };
 

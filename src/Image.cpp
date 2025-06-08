@@ -3,6 +3,7 @@
 #include <iostream>  
 #include <sstream>
 #include <limits>
+#include <array>
 
 
 bool Image::load(const std::string& filename) {
@@ -82,4 +83,76 @@ bool Image::save(const std::string& filename) const {
     }
 
     return true;
+}
+
+
+void Image::applyGrayScale() {
+    for (Pixel& pixel : m_pixel_data) {
+        float r_original = pixel.r;
+        float g_original = pixel.g;
+        float b_original = pixel.b;
+
+        float gray_value = (0.299f * r_original) + (0.587f * g_original) + (0.114f * b_original);
+
+        unsigned char final_gray = static_cast<unsigned char>(gray_value);
+
+        pixel.r = final_gray;
+        pixel.g = final_gray;
+        pixel.b = final_gray;
+    }
+}
+
+
+void Image::applyInvert() {
+    for (Pixel& pixel : m_pixel_data) {
+        float r_original = pixel.r;
+        float g_original = pixel.g;
+        float b_original = pixel.b;
+
+        float new_r = 255 - r_original;
+        float new_g = 255 - g_original;
+        float new_b = 255 - b_original;
+
+        pixel.r = static_cast<unsigned char>(new_r);
+        pixel.g = static_cast<unsigned char>(new_g);
+        pixel.b = static_cast<unsigned char>(new_b);
+    }
+}
+
+
+void Image::applyBlur() {
+    std::vector<Pixel> blurred_pixel_data(m_width * m_height);
+
+    float kernel_values[9] = {0.0625, 0.125, 0.0625, 0.125, 0.25, 0.125, 0.0625, 0.125, 0.0625};
+
+    for (int y = 0; y < m_height; y++) {
+        for (int x = 0; x < m_width; x++) {
+            int idx = getPixelIndex(x, y);
+            if (y == 0 || x == 0 || x == m_width-1 || y == m_height-1) {
+                blurred_pixel_data[idx].r = 0;
+                blurred_pixel_data[idx].g = 0;
+                blurred_pixel_data[idx].b = 0;
+            } else {
+                float r_sum = 0.0f;
+                float g_sum = 0.0f;
+                float b_sum = 0.0f;
+                int count = 0;
+                for (int i = x-1; i < x+2; i++) {
+                    for (int j = y-1; j < y+2; j++) {
+                        int index = getPixelIndex(i, j);
+                        r_sum += m_pixel_data[index].r * kernel_values[count];
+                        g_sum += m_pixel_data[index].g * kernel_values[count];
+                        b_sum += m_pixel_data[index].b * kernel_values[count];
+                        count++;
+                    }
+                }
+
+                blurred_pixel_data[idx].r = static_cast<unsigned char>(r_sum);
+                blurred_pixel_data[idx].g = static_cast<unsigned char>(g_sum);
+                blurred_pixel_data[idx].b = static_cast<unsigned char>(b_sum);
+            }
+        }
+    }
+
+    m_pixel_data = blurred_pixel_data;
 }
